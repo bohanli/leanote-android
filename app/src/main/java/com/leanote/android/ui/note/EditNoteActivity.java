@@ -757,6 +757,7 @@ public class EditNoteActivity extends AppCompatActivity implements EditorFragmen
         note.setTitle(title);
         note.setContent(content);
         //note.setIsDirty(true);
+        //note.setIsMarkDown(AccountHelper.getDefaultAccount().isUseMarkdown());
 
     }
 

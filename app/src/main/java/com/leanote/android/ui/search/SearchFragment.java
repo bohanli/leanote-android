@@ -92,6 +92,7 @@ public class SearchFragment extends Fragment implements SearchView.OnQueryTextLi
         }
 
         for (NoteDetail model : models) {
+            if (model.getContent() == null || model.getTitle()==null) continue;  /////////////
             final String content = model.getContent().toLowerCase();
             final String title = model.getTitle().toLowerCase();
 

@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.leanote.android.datasets.AccountTable;
 import com.leanote.android.model.AccountHelper;
@@ -155,6 +156,24 @@ public class LeanoteDB extends SQLiteOpenHelper {
                     }
 
                     ContentValues values = getContentValuesFromNote(note);
+                    /*ContentValues values = new ContentValues();
+                    values.put("noteId", note.getNoteId());
+                    values.put("notebookId", note.getNoteBookId());
+                    values.put("userId", note.getUserId());
+                    values.put("title", note.getTitle());
+                    values.put("desc", note.getDesc());
+                    values.put("tags", note.getTags());
+                    values.put("note_abstract", note.getNoteAbstract());
+                    values.put("content", note.getContent());
+                    values.put("isMarkdown", note.isMarkDown() ? 1 : 0);
+                    values.put("isBlog", note.isPublicBlog() ? 1 : 0);
+                    values.put("isTrash", note.isTrash() ? 1 : 0);
+                    values.put("usn", note.getUsn());
+                    values.put("updatedTime", note.getUpdatedTime());
+                    values.put("files", note.getFileIds());
+                    values.put("createdTime", note.getCreatedTime());
+                    values.put("updatedTime", note.getUpdatedTime());
+                    values.put("publicTime", note.getPublicTime());*/
 
                     db.insert(NOTES_TABLE, null, values);
                 }
@@ -319,18 +338,23 @@ public class LeanoteDB extends SQLiteOpenHelper {
     }
 
     public long addNote(NoteDetail newNote) {
+        newNote.setIsMarkDown(AccountHelper.getDefaultAccount().isUseMarkdown());
+
         ContentValues values = new ContentValues();
+
 
         values.put("noteId", newNote.getNoteId());
         values.put("notebookId", newNote.getNoteBookId());
         values.put("userId", newNote.getUserId());
         values.put("title", newNote.getTitle());
         values.put("updatedTime", newNote.getUpdatedTime());
+        values.put("isMarkdown", newNote.isMarkDown() ? 1 : 0);
 
         long result = db.insert(NOTES_TABLE, null, values);
         if (result > 0) {
             newNote.setId(result);
         }
+        Log.v("addNote", new Long(result).toString());
         return result;
     }
 
@@ -767,8 +791,10 @@ public class LeanoteDB extends SQLiteOpenHelper {
     public int getAccountUsn() {
         Cursor c = db.query(ACCOUNTS_TABLE, null, "local_id=?", new String[]{String.valueOf(0)}, null, null, "");
 
+        Log.v("getAccountUsn", "ahaha");
         try {
             if (c.moveToNext()) {
+                Log.v("getAccountUsn", new Integer(c.getInt(8)).toString());
                 return c.getInt(8);
             }
 
