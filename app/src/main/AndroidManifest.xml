@@ -61,7 +61,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LeaMainActivity" >
+        <activity android:name=".ui.LeaMainActivity"
+            android:theme="@style/AppTheme4Preview">
         </activity>
         <activity android:name=".ui.LeaMainActivity2" >
         </activity>
