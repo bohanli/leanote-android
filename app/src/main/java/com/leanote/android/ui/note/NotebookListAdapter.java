@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.leanote.android.Leanote;
@@ -60,9 +63,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public NotebookListAdapter(Context context) {
         mLayoutInflater = LayoutInflater.from(context);
-
         mEndlistIndicatorHeight = DisplayUtils.dpToPx(context, 74);
-
     }
 
     public void setmOnNotebooksLoadedListener(OnNotebooksLoadedListener mOnNotebooksLoadedListener) {
@@ -117,7 +118,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (viewType == VIEW_TYPE_MENU) {
             return new NotebookAddViewHolder(new SearchToolbar(parent.getContext(), "Notebook"));
         } else{
-            View view = mLayoutInflater.inflate(R.layout.post_cardview, parent, false);
+            View view = mLayoutInflater.inflate(R.layout.notebookview, parent, false);
             return new NotebookViewHolder(view);
         }
     }
@@ -134,8 +135,9 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         final NotebookInfo notebook = mNotebooks.get(position - 1);
-
-        Context context = holder.itemView.getContext();
+        // TODO: 2015/12/18
+        //notebook.setTitle("test" + position);
+        final Context context = holder.itemView.getContext();
 
         if (holder instanceof NotebookViewHolder) {
             NotebookViewHolder postHolder = (NotebookViewHolder) holder;
@@ -146,9 +148,9 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 postHolder.txtTitle.setText("(" + context.getResources().getText(R.string.untitled) + ")");
             }
 
-            postHolder.txtDate.setText(notebook.getUpdateTime());
-            postHolder.txtDate.setVisibility(View.VISIBLE);
-            postHolder.btnTrash.setButtonType(PostListButton.BUTTON_TRASH);
+//            postHolder.txtDate.setText(notebook.getUpdateTime());  /////////////
+//            postHolder.txtDate.setVisibility(View.VISIBLE);
+//            postHolder.btnTrash.setButtonType(PostListButton.BUTTON_TRASH);
 
             configureNotebookButtons(postHolder, notebook);
         }
@@ -158,9 +160,41 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             @Override
             public void onClick(View v) {
                 NotebookInfo selectedNotebook = getItem(position - 1);
+                // TODO: 2015/12/18
+                //selectedNotebook.setTitle("clicked" + position);
+                notifyDataSetChanged();
                 if (mOnNotebookSelectedListener != null && selectedNotebook != null) {
                     mOnNotebookSelectedListener.onNotebookSelected(selectedNotebook);
                 }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                final NotebookInfo selectedNotebook = getItem(position - 1);
+                // TODO: 2015/12/18
+                //selectedNotebook.setTitle("long clicked" + position);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                final CharSequence []items = {"Edit", "Trash"};
+                final int[] type = {PostListButton.BUTTON_EDIT, PostListButton.BUTTON_TRASH};
+                dialog = dialog.setTitle(selectedNotebook.getTitle());
+                dialog.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //String selectedItem = items[which].toString();
+                        int buttonType = type[which];
+                        if (buttonType != -1 && mOnNotebookButtonClickListener != null) {
+                            mOnNotebookButtonClickListener.onNotebookButtonClicked(buttonType, selectedNotebook);
+                        }
+                    }
+                }).show();
+
+                notifyDataSetChanged();
+                if (mOnNotebookSelectedListener != null && selectedNotebook != null) {
+                    mOnNotebookSelectedListener.onNotebookSelected(selectedNotebook);
+                }
+                return true;
             }
         });
     }
@@ -169,11 +203,13 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private void configureNotebookButtons(final NotebookViewHolder holder,
                                           final NotebookInfo notebook) {
         // posts with local changes have preview rather than view button
-        holder.btnView.setButtonType(PostListButton.BUTTON_VIEW);
+//        holder.btnView.setButtonType(PostListButton.BUTTON_VIEW);
 
-        holder.btnEdit.setVisibility(View.VISIBLE);
-        holder.btnView.setVisibility(View.VISIBLE);
-        holder.btnTrash.setVisibility(View.VISIBLE);
+//        holder.btnEdit.setVisibility(View.VISIBLE);
+//        holder.btnView.setVisibility(View.VISIBLE);
+//        holder.btnTrash.setVisibility(View.VISIBLE);
+
+
 
 
         View.OnClickListener btnClickListener = new View.OnClickListener() {
@@ -186,9 +222,10 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
         };
 
-        holder.btnEdit.setOnClickListener(btnClickListener);
-        holder.btnView.setOnClickListener(btnClickListener);
-        holder.btnTrash.setOnClickListener(btnClickListener);
+//        holder.btnEdit.setOnClickListener(btnClickListener);
+//        holder.btnView.setOnClickListener(btnClickListener);
+//        holder.btnTrash.setOnClickListener(btnClickListener);
+
     }
 
     /*
@@ -201,34 +238,34 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                    final boolean showRow1) {
         // first animate out the button row, then show/hide the appropriate buttons,
         // then animate the row layout back in
-        PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0f);
-        PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0f);
-        ObjectAnimator animOut = ObjectAnimator.ofPropertyValuesHolder(holder.layoutButtons, scaleX, scaleY);
-        animOut.setDuration(ROW_ANIM_DURATION);
-        animOut.setInterpolator(new AccelerateInterpolator());
-
-        animOut.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // row 1
-                holder.btnEdit.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
-                holder.btnView.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
-                //holder.btnMore.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
-                // row 2
-                //holder.btnStats.setVisibility(!showRow1 && canShowStatsForPost(note) ? View.VISIBLE : View.GONE);
-                holder.btnTrash.setVisibility(!showRow1 ? View.VISIBLE : View.GONE);
-                //holder.btnBack.setVisibility(!showRow1 ? View.VISIBLE : View.GONE);
-
-                PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 0f, 1f);
-                PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f, 1f);
-                ObjectAnimator animIn = ObjectAnimator.ofPropertyValuesHolder(holder.layoutButtons, scaleX, scaleY);
-                animIn.setDuration(ROW_ANIM_DURATION);
-                animIn.setInterpolator(new DecelerateInterpolator());
-                animIn.start();
-            }
-        });
-
-        animOut.start();
+//        PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0f);
+//        PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 0f);
+//        ObjectAnimator animOut = ObjectAnimator.ofPropertyValuesHolder(holder.layoutButtons, scaleX, scaleY);
+//        animOut.setDuration(ROW_ANIM_DURATION);
+//        animOut.setInterpolator(new AccelerateInterpolator());
+//
+//        animOut.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                // row 1
+////                holder.btnEdit.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
+////                holder.btnView.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
+//                //holder.btnMore.setVisibility(showRow1 ? View.VISIBLE : View.GONE);
+//                // row 2
+//                //holder.btnStats.setVisibility(!showRow1 && canShowStatsForPost(note) ? View.VISIBLE : View.GONE);
+////                holder.btnTrash.setVisibility(!showRow1 ? View.VISIBLE : View.GONE);
+//                //holder.btnBack.setVisibility(!showRow1 ? View.VISIBLE : View.GONE);
+//
+//                PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 0f, 1f);
+//                PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 0f, 1f);
+//                ObjectAnimator animIn = ObjectAnimator.ofPropertyValuesHolder(holder.layoutButtons, scaleX, scaleY);
+//                animIn.setDuration(ROW_ANIM_DURATION);
+//                animIn.setInterpolator(new DecelerateInterpolator());
+//                animIn.start();
+//            }
+//        });
+//
+//        animOut.start();
     }
 
     public void loadNotebooks() {
@@ -258,7 +295,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (position > -1) {
             mNotebooks.remove(position);
             if (mNotebooks.size() > 0) {
-                notifyItemRemoved(position);
+                notifyItemRemoved(position+1);
             } else {
                 notifyDataSetChanged();
             }
@@ -282,26 +319,28 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     class NotebookViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtTitle;
-        private final TextView txtDate;
-
-        private final PostListButton btnEdit;
-        private final PostListButton btnView;
-
-        private final PostListButton btnTrash;
-
-        private final ViewGroup layoutButtons;
+//        private final TextView txtDate;
+//
+//        private final PostListButton btnEdit;
+//        private final PostListButton btnView;
+//        private final FrameLayout btnLayout;
+//
+//        private final PostListButton btnTrash;
+//
+//        private final ViewGroup layoutButtons;
 
         public NotebookViewHolder(View view) {
             super(view);
 
             txtTitle = (TextView) view.findViewById(R.id.text_title);
-            txtDate = (TextView) view.findViewById(R.id.text_date);
-
-            btnEdit = (PostListButton) view.findViewById(R.id.btn_edit);
-            btnView = (PostListButton) view.findViewById(R.id.btn_view);
-
-            btnTrash = (PostListButton) view.findViewById(R.id.btn_trash);
-            layoutButtons = (ViewGroup) view.findViewById(R.id.layout_buttons);
+//            txtDate = (TextView) view.findViewById(R.id.text_date);
+//
+//            btnEdit = (PostListButton) view.findViewById(R.id.btn_edit);
+//            btnView = (PostListButton) view.findViewById(R.id.btn_view);
+//            btnLayout = (FrameLayout) view.findViewById(R.id.__framelayout__);
+//
+//            btnTrash = (PostListButton) view.findViewById(R.id.btn_trash);
+//            layoutButtons = (ViewGroup) view.findViewById(R.id.layout_buttons);
         }
     }
 

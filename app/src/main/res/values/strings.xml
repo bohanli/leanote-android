@@ -148,7 +148,7 @@
     <string name="image_alignment">Alignment</string>
     <string name="horizontal_alignment">Horizontal alignment</string>
     <string name="caption">Caption (optional)</string>
-    <string name="preview_note">preview note</string>
+    <string name="preview_note">Preview</string>
 
     <!-- Edit Media -->
     <string name="media_edit_title_text">Title</string>

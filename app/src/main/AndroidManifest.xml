@@ -136,7 +136,9 @@
         <activity
             android:name=".ui.search.SearchActivity" >
         </activity>
-
+        <activity
+            android:name=".ui.ShareNoteActivity">
+        </activity>
     </application>
 
 </manifest>

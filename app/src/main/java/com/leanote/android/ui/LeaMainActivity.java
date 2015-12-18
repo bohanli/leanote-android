@@ -214,7 +214,7 @@ public class LeaMainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        getSupportActionBar().setTitle("Leanote");
 
         mViewPager = (LeaViewPager) findViewById(R.id.viewpager_main);
         mTabAdapter = new LeaMainTabAdapter(getFragmentManager());

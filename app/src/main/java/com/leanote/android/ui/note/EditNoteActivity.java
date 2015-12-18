@@ -811,9 +811,9 @@ public class EditNoteActivity extends AppCompatActivity implements EditorFragmen
         } else if (itemId == R.id.menu_preview_post) {
             mViewPager.setCurrentItem(PAGE_PREVIEW);
         } else if (itemId == android.R.id.home) {
-            if (mViewPager.getCurrentItem() > PAGE_CONTENT) {
-                mViewPager.setCurrentItem(PAGE_CONTENT);
-                invalidateOptionsMenu();
+                if (mViewPager.getCurrentItem() > PAGE_CONTENT) {
+                    mViewPager.setCurrentItem(PAGE_CONTENT);
+                    invalidateOptionsMenu();
             } else {
                 saveAndFinish();
             }

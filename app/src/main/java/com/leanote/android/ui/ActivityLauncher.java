@@ -16,6 +16,7 @@ import com.leanote.android.networking.SelfSignedSSLCertsManager;
 import com.leanote.android.ui.accounts.NewAccountActivity;
 import com.leanote.android.ui.note.EditNoteActivity;
 import com.leanote.android.ui.note.EditNotebookActivity;
+import com.leanote.android.ui.note.NoteListActivity;
 import com.leanote.android.ui.note.NotePreviewActivity;
 import com.leanote.android.ui.post.BlogHomeActivity;
 import com.leanote.android.ui.search.SearchActivity;
@@ -77,6 +78,12 @@ public class ActivityLauncher {
         activity.startActivityForResult(intent, RequestCodes.EDIT_NOTE);
     }
 
+    public static void shareNoteForResult(Activity activity, long noteId) {
+        Intent intent = new Intent(activity.getApplicationContext(), ShareNoteActivity.class);
+        intent.putExtra(ShareNoteActivity.EXTRA_NOTEID, noteId);
+        activity.startActivityForResult(intent, RequestCodes.SHARE_NOTE);
+    }
+
     public static void editNotebookForResult(Activity activity, long localNotebookId) {
         Intent intent = new Intent(activity.getApplicationContext(), EditNotebookActivity.class);
         intent.putExtra(EditNotebookActivity.EXTRA_NEW_NOTEBOOK_ID, localNotebookId);
@@ -84,12 +91,11 @@ public class ActivityLauncher {
         activity.startActivityForResult(intent, RequestCodes.EDIT_NOTE);
     }
 
-    public static void viewNotebookForResult(Activity activity, long localNotebookId) {
-        Intent intent = new Intent(activity.getApplicationContext(), EditNotebookActivity.class);
-        intent.putExtra(EditNotebookActivity.EXTRA_NEW_NOTEBOOK_ID, localNotebookId);
-        intent.putExtra(EditNotebookActivity.EXTRA_IS_NEW_NOTEBOOK, false);
-        activity.startActivityForResult(intent, RequestCodes.EDIT_NOTE);
-    }
+//    public static void viewNotebookForResult(Activity activity, long localNotebookId) {
+//        Intent intent = new Intent(activity.getApplicationContext(), NoteListActivity.class);
+//        intent.putExtra(NoteListActivity.EXTRA_NOTEBOOK_ID, localNotebookId);
+//        activity.startActivityForResult(intent, RequestCodes.EDIT_NOTE);
+//    }
 
 
     public static void slideOutToRight(Activity activity) {
