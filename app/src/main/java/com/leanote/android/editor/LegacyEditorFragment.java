@@ -255,7 +255,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
                 }
 
                 int newPos = mContentEditText.getSelectionStart() + ( thisProgress - lastProgress );
-                if ( 0 < newPos && newPos < mContentEditText.getText().length() )
+                if ( 0 <= newPos && newPos <= mContentEditText.getText().length() )
                     mContentEditText.setSelection(newPos);
             }
             //开始拖动

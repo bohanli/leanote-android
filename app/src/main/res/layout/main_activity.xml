@@ -45,10 +45,17 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/tab_background"
+        android:background="#ffffff"
         android:elevation="@dimen/tabs_elevation"
         app:tabIndicatorColor="@color/tab_indicator"
         android:layout_alignParentBottom="true"
         android:layout_below="@id/connection_bar"/>
+    <!--android:background="#0087be@color/tab_background"-->
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#dddddd"
+        android:layout_above="@id/tab_layout"
+        />
 </RelativeLayout>

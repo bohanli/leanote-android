@@ -191,7 +191,7 @@ public class LeanoteDB extends SQLiteOpenHelper {
 
         String[] args = {userId};
         //Cursor c = db.query(NOTES_TABLE, null, null, null, null, null, "");
-        Cursor c = db.query(NOTES_TABLE, null, null, null, null, null, "");
+        Cursor c = db.query(NOTES_TABLE, null, null, null, null, null, "updatedTime DESC");
         try {
             while (c.moveToNext()) {
                 NoteDetail detail = fillNote(c);
@@ -625,7 +625,40 @@ public class LeanoteDB extends SQLiteOpenHelper {
         } finally {
             SqlUtils.closeCursor(c);
         }
-
+    }
+    public List<NotebookInfo> getRootNotebookList() {
+        Cursor c = db.query(NOTEBOOKS_TABLE, null, "parentNotebookId=?", new String[]{""}, null, null, "");
+        List<NotebookInfo> notebooks = new ArrayList<>();
+        try {
+            while (c.moveToNext()) {
+                NotebookInfo rootNotebook = new NotebookInfo();
+                rootNotebook.setTitle(c.getString(4));
+                rootNotebook.setNotebookId(c.getString(1));
+                rootNotebook.setUpdateTime(c.getString(10));
+                notebooks.add(rootNotebook);
+            }
+            //Log.e("getRootNotebookList", new Integer(notebooks.size()).toString());
+            return notebooks;
+        } finally {
+            SqlUtils.closeCursor(c);
+        }
+    }
+    public List<NotebookInfo> getChildNotebookList(NotebookInfo notebook) {
+        Cursor c = db.query(NOTEBOOKS_TABLE, null, "parentNotebookId=?", new String[]{notebook.getNotebookId()}, null, null, "");
+        List<NotebookInfo> notebooks = new ArrayList<>();
+        try {
+            while (c.moveToNext()) {
+                NotebookInfo childNotebook = new NotebookInfo();
+                childNotebook.setTitle(c.getString(4));
+                childNotebook.setNotebookId(c.getString(1));
+                childNotebook.setUpdateTime(c.getString(10));
+                notebooks.add(childNotebook);
+            }
+            //Log.e("getChildNotebookList", new Integer(notebooks.size()).toString());
+            return notebooks;
+        } finally {
+            SqlUtils.closeCursor(c);
+        }
     }
 
     public void saveNoteSettings(NoteDetail note) {

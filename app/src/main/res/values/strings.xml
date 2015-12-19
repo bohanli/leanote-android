@@ -9,7 +9,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sign_in">Sign in</string>
-    <string name="email">Email</string>
+    <string name="email">Username</string>
     <string name="password">Password</string>
     <string name="verification_code">Verification code</string>
     <string name="site_address">Your self-hosted address (URL)</string>
@@ -87,7 +87,7 @@
 
     <string name="tabbar_accessibility_label_me">Me</string>
     <string name="tabbar_note">Note</string>
-    <string name="tabbar_post">Post</string>
+    <string name="tabbar_post">Blog</string>
     <string name="tabbar_me">Me</string>
     <string name="tabbar_notebook">Notebook</string>
     <string name="tabbar_category">Category</string>

@@ -37,4 +37,5 @@
             tools:text="text_title" />
 
     </LinearLayout>
+
 </android.support.v7.widget.CardView>

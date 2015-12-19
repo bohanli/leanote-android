@@ -49,6 +49,8 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private boolean mIsLoadingNotebooks;
 
     private List<NotebookInfo> mNotebooks = new ArrayList<>();
+    private List<Integer> mNotebookLevel = new ArrayList<Integer>();
+    private List<Boolean> mHasExpanded = new ArrayList<Boolean>();
     private final List<NotebookInfo> mHiddenNotebooks = new ArrayList<>();
 
     private final LayoutInflater mLayoutInflater;
@@ -60,6 +62,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int VIEW_TYPE_NOTEBOOK = 0;
     private static final int VIEW_TYPE_ENDLIST_INDICATOR = 1;
     private static final int VIEW_TYPE_MENU = 2;
+    private static final int VIEW_TYPE_CHILD_NOTEBOOK = 3;
 
     public NotebookListAdapter(Context context) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -97,7 +100,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (position == 0) {
             return VIEW_TYPE_MENU;
         }
-        return VIEW_TYPE_NOTEBOOK;
+        return mNotebookLevel.get(position-1).equals(0) ? VIEW_TYPE_NOTEBOOK : VIEW_TYPE_CHILD_NOTEBOOK;  //??
     }
 
     @Override
@@ -117,7 +120,9 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return new EndListViewHolder(view);
         } else if (viewType == VIEW_TYPE_MENU) {
             return new NotebookAddViewHolder(new SearchToolbar(parent.getContext(), "Notebook"));
-        } else{
+//        } else if (viewType == ) {
+
+        } else {
             View view = mLayoutInflater.inflate(R.layout.notebookview, parent, false);
             return new NotebookViewHolder(view);
         }
@@ -127,7 +132,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         // nothing to do if this is the static endlist indicator
-        int posType = getItemViewType(position);
+        final int posType = getItemViewType(position);
         if (posType == VIEW_TYPE_ENDLIST_INDICATOR) {
             return;
         } else if (posType == VIEW_TYPE_MENU) {
@@ -143,7 +148,9 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             NotebookViewHolder postHolder = (NotebookViewHolder) holder;
 
             if (StringUtils.isNotEmpty(notebook.getTitle())) {
-                postHolder.txtTitle.setText(notebook.getTitle());
+                String tempS = "";
+                for (int i=0; i<mNotebookLevel.get(position-1); i++) tempS += "    ";
+                postHolder.txtTitle.setText(tempS + notebook.getTitle());
             } else {
                 postHolder.txtTitle.setText("(" + context.getResources().getText(R.string.untitled) + ")");
             }
@@ -162,6 +169,24 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 NotebookInfo selectedNotebook = getItem(position - 1);
                 // TODO: 2015/12/18
                 //selectedNotebook.setTitle("clicked" + position);
+                if (mHasExpanded.get(position-1)) {
+                    int level = mNotebookLevel.get(position-1) + 1;
+                    for (int i=position; i<mNotebooks.size() && level==mNotebookLevel.get(position); ) {
+                        mNotebooks.remove(position);
+                        mNotebookLevel.remove(position);
+                        mHasExpanded.remove(position);
+                    }
+                    mHasExpanded.set(position-1, false);
+                }
+                else {
+                    List<NotebookInfo> childNoteBook = Leanote.leaDB.getChildNotebookList(selectedNotebook);
+                    for (int i = 0; i < childNoteBook.size(); i++) {
+                        mNotebooks.add(position + i, childNoteBook.get(i));
+                        mNotebookLevel.add(position + i, mNotebookLevel.get(position - 1) + 1);
+                        mHasExpanded.add(position + i, new Boolean(false));
+                    }
+                    mHasExpanded.set(position-1, true);
+                }
                 notifyDataSetChanged();
                 if (mOnNotebookSelectedListener != null && selectedNotebook != null) {
                     mOnNotebookSelectedListener.onNotebookSelected(selectedNotebook);
@@ -200,8 +225,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    private void configureNotebookButtons(final NotebookViewHolder holder,
-                                          final NotebookInfo notebook) {
+    private void configureNotebookButtons(final NotebookViewHolder holder, final NotebookInfo notebook) {
         // posts with local changes have preview rather than view button
 //        holder.btnView.setButtonType(PostListButton.BUTTON_VIEW);
 
@@ -294,6 +318,8 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         if (position > -1) {
             mNotebooks.remove(position);
+            mNotebookLevel.remove(position);
+            mHasExpanded.remove(position);
             if (mNotebooks.size() > 0) {
                 notifyItemRemoved(position+1);
             } else {
@@ -382,6 +408,8 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private class LoadNotebooksTask extends AsyncTask<Void, Void, Boolean> {
         private List<NotebookInfo> tmpNotebooks;
+        private List<Integer> tmpNotebookLevel;
+        private List<Boolean> tmpHasExpanded;
 
         @Override
         protected void onPreExecute() {
@@ -398,7 +426,9 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @Override
         protected Boolean doInBackground(Void... voids) {
 
-            tmpNotebooks = Leanote.leaDB.getNotebookList();
+            tmpNotebooks = Leanote.leaDB.getRootNotebookList();
+            tmpNotebookLevel = new ArrayList<Integer>();
+            tmpHasExpanded = new ArrayList<Boolean>();
             AppLog.i("loading notebooks:" + tmpNotebooks);
             for (NotebookInfo hiddenNote : mHiddenNotebooks) {
                 int index = -1;
@@ -410,6 +440,10 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 }
                 tmpNotebooks.remove(index);
             }
+            for (int i = 0; i < tmpNotebooks.size(); i++) {
+                tmpNotebookLevel.add(0);
+                tmpHasExpanded.add(false);
+            }
 
             return true;
         }
@@ -418,7 +452,11 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         protected void onPostExecute(Boolean result) {
             if (result) {
                 mNotebooks.clear();
+                mNotebookLevel.clear();
+                mHasExpanded.clear();
                 mNotebooks.addAll(tmpNotebooks);
+                mNotebookLevel.addAll(tmpNotebookLevel);
+                mHasExpanded.addAll(tmpHasExpanded);
                 notifyDataSetChanged();
             }
 

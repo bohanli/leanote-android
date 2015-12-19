@@ -175,9 +175,10 @@ public class LeaMainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.searchBar:
-//                Toast.makeText(this, "你点击了“搜索”按键！", Toast.LENGTH_SHORT).show();
-//                return true;
+            case R.id.searchBar:
+                //Toast.makeText(this, "你点击了“搜索”按键！", Toast.LENGTH_SHORT).show();
+                ActivityLauncher.startSearchForResult(LeaMainActivity.this);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -243,6 +244,15 @@ public class LeaMainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
+
+                String[] mPageTitle = {"Note", "Blog", "Notebook", "About me"};
+                LeaMainActivity.this.getSupportActionBar().setTitle(mPageTitle[tab.getPosition()]);
+
+                if (mOptionsMenu != null) {
+                    mOptionsMenu.clear();
+                    if (tab.getPosition() < 3)
+                        getMenuInflater().inflate(R.menu.toolbar, mOptionsMenu);
+                }
             }
 
             @Override
