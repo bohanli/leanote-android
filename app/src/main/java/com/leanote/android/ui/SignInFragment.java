@@ -70,6 +70,7 @@ public class SignInFragment extends AbstractFragment implements TextWatcher {
     private RelativeLayout mUrlButtonLayout;
 //    private RelativeLayout mTwoStepLayout;
 //    private LinearLayout mTwoStepFooter;
+//
 
     private ImageView mInfoButton;
     private ImageView mInfoButtonSecondary;
