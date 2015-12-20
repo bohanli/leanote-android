@@ -245,7 +245,7 @@ public class LeaMainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
 
-                String[] mPageTitle = {"Note", "Blog", "Notebook", "About me"};
+                String[] mPageTitle = {"Recent Notes", "Blog", "Notebook", "About me"};
                 LeaMainActivity.this.getSupportActionBar().setTitle(mPageTitle[tab.getPosition()]);
 
                 if (mOptionsMenu != null) {

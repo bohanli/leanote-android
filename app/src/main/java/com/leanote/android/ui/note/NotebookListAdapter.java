@@ -7,8 +7,12 @@ import android.animation.PropertyValuesHolder;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.leanote.android.Leanote;
@@ -130,7 +135,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         // nothing to do if this is the static endlist indicator
         final int posType = getItemViewType(position);
         if (posType == VIEW_TYPE_ENDLIST_INDICATOR) {
@@ -144,23 +149,65 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         //notebook.setTitle("test" + position);
         final Context context = holder.itemView.getContext();
 
-        if (holder instanceof NotebookViewHolder) {
-            NotebookViewHolder postHolder = (NotebookViewHolder) holder;
 
-            if (StringUtils.isNotEmpty(notebook.getTitle())) {
-                String tempS = "";
-                for (int i=0; i<mNotebookLevel.get(position-1); i++) tempS += "    ";
-                postHolder.txtTitle.setText(tempS + notebook.getTitle());
-            } else {
-                postHolder.txtTitle.setText("(" + context.getResources().getText(R.string.untitled) + ")");
-            }
+        NotebookViewHolder postHolder = (NotebookViewHolder) holder;
+
+        if (StringUtils.isNotEmpty(notebook.getTitle())) {
+            String tempS = "";
+            for (int i = 0; i < mNotebookLevel.get(position - 1); i++) tempS += "    ";
+            postHolder.txtTitle.setText(tempS + notebook.getTitle());
+        } else {
+            postHolder.txtTitle.setText("(" + context.getResources().getText(R.string.untitled) + ")");
+        }
+        postHolder.arrow.setVisibility(View.VISIBLE);
+
+        if (mNotebookLevel.get(position-1) > 0)
+            ((CardView) postHolder.itemView).setCardBackgroundColor(0xFFFFFFFF - Math.min(0x888888, mNotebookLevel.get(position-1)*0x111111));
 
 //            postHolder.txtDate.setText(notebook.getUpdateTime());  /////////////
 //            postHolder.txtDate.setVisibility(View.VISIBLE);
 //            postHolder.btnTrash.setButtonType(PostListButton.BUTTON_TRASH);
 
-            configureNotebookButtons(postHolder, notebook);
-        }
+        configureNotebookButtons(postHolder, notebook);
+
+        postHolder.arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotebookInfo selectedNotebook = getItem(position - 1);
+
+                if (mHasExpanded.get(position - 1)) {
+                    int level = mNotebookLevel.get(position - 1) + 1;
+                    for (int i = position; i < mNotebooks.size() && level == mNotebookLevel.get(position); ) {
+                        mNotebooks.remove(position);
+                        mNotebookLevel.remove(position);
+                        mHasExpanded.remove(position);
+                    }
+                    mHasExpanded.set(position - 1, false);
+                } else {
+                    List<NotebookInfo> childNoteBook = Leanote.leaDB.getChildNotebookList(selectedNotebook);
+                    if (childNoteBook.size() > 0) {
+                        for (int i = 0; i < childNoteBook.size(); i++) {
+                            mNotebooks.add(position + i, childNoteBook.get(i));
+                            mNotebookLevel.add(position + i, mNotebookLevel.get(position - 1) + 1);
+                            mHasExpanded.add(position + i, false);
+                        }
+                        mHasExpanded.set(position - 1, true);
+                        ((NotebookViewHolder) holder).arrow.setImageResource(R.drawable.arrow_face_down);
+                        ((NotebookViewHolder) holder).arrow.setVisibility(View.INVISIBLE);
+                        Log.e("childs", "expanding");
+                    }
+                }
+
+                notifyDataSetChanged();
+                if (mOnNotebookSelectedListener != null && selectedNotebook != null) {
+                    mOnNotebookSelectedListener.onNotebookSelected(selectedNotebook);
+                }
+            }
+        });
+        if (mHasExpanded.get(position-1))
+            postHolder.arrow.setImageResource(R.drawable.arrow_face_down);
+        else
+            postHolder.arrow.setImageResource(R.drawable.arrow_face_left);
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -169,27 +216,11 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 NotebookInfo selectedNotebook = getItem(position - 1);
                 // TODO: 2015/12/18
                 //selectedNotebook.setTitle("clicked" + position);
-                if (mHasExpanded.get(position-1)) {
-                    int level = mNotebookLevel.get(position-1) + 1;
-                    for (int i=position; i<mNotebooks.size() && level==mNotebookLevel.get(position); ) {
-                        mNotebooks.remove(position);
-                        mNotebookLevel.remove(position);
-                        mHasExpanded.remove(position);
-                    }
-                    mHasExpanded.set(position-1, false);
-                }
-                else {
-                    List<NotebookInfo> childNoteBook = Leanote.leaDB.getChildNotebookList(selectedNotebook);
-                    for (int i = 0; i < childNoteBook.size(); i++) {
-                        mNotebooks.add(position + i, childNoteBook.get(i));
-                        mNotebookLevel.add(position + i, mNotebookLevel.get(position - 1) + 1);
-                        mHasExpanded.add(position + i, new Boolean(false));
-                    }
-                    mHasExpanded.set(position-1, true);
-                }
                 notifyDataSetChanged();
                 if (mOnNotebookSelectedListener != null && selectedNotebook != null) {
                     mOnNotebookSelectedListener.onNotebookSelected(selectedNotebook);
+                    ActivityLauncher.viewNoteFragmentForResult(
+                            ((Leanote) Leanote.getContext().getApplicationContext()).getCurrentActivity(), selectedNotebook);
                 }
             }
         });
@@ -229,6 +260,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         // posts with local changes have preview rather than view button
 //        holder.btnView.setButtonType(PostListButton.BUTTON_VIEW);
 
+        holder.arrow.setVisibility(View.VISIBLE);
 //        holder.btnEdit.setVisibility(View.VISIBLE);
 //        holder.btnView.setVisibility(View.VISIBLE);
 //        holder.btnTrash.setVisibility(View.VISIBLE);
@@ -345,6 +377,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     class NotebookViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtTitle;
+        private final ImageView arrow;
 //        private final TextView txtDate;
 //
 //        private final PostListButton btnEdit;
@@ -359,6 +392,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             super(view);
 
             txtTitle = (TextView) view.findViewById(R.id.text_title);
+            arrow =  (ImageView) view.findViewById(R.id.notebook_arrow);
 //            txtDate = (TextView) view.findViewById(R.id.text_date);
 //
 //            btnEdit = (PostListButton) view.findViewById(R.id.btn_edit);

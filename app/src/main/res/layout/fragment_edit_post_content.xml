@@ -80,7 +80,7 @@
     <LinearLayout
         android:id="@+id/sliding_bar"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/legacy_format_bar_height"
+        android:layout_height="30dp"
         android:layout_gravity="bottom"
         android:background="@color/legacy_format_bar_background"
         android:visibility="gone"
@@ -89,6 +89,7 @@
         <SeekBar android:id="@+id/cursor_seek_bar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:max="10"
             android:progress="5"
             android:secondaryProgress="5" />

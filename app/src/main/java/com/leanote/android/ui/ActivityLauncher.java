@@ -14,6 +14,7 @@ import com.leanote.android.model.NotebookInfo;
 import com.leanote.android.networking.SSLCertsViewActivity;
 import com.leanote.android.networking.SelfSignedSSLCertsManager;
 import com.leanote.android.ui.accounts.NewAccountActivity;
+import com.leanote.android.ui.main.Notebook_ViewNote;
 import com.leanote.android.ui.note.EditNoteActivity;
 import com.leanote.android.ui.note.EditNotebookActivity;
 import com.leanote.android.ui.note.NoteListActivity;
@@ -90,6 +91,11 @@ public class ActivityLauncher {
         intent.putExtra(EditNotebookActivity.EXTRA_IS_NEW_NOTEBOOK, false);
         activity.startActivityForResult(intent, RequestCodes.EDIT_NOTE);
     }
+    public static void viewNoteFragmentForResult(Activity activity, NotebookInfo notebook) {
+        Intent intent = new Intent(activity.getApplicationContext(), Notebook_ViewNote.class);
+        intent.putExtra(Notebook_ViewNote.EXTRA_NOTEBOOK, notebook.getNotebookId());
+        activity.startActivityForResult(intent, RequestCodes.NOTEBOOK_VIEW_NOTE);
+    }
 
 //    public static void viewNotebookForResult(Activity activity, long localNotebookId) {
 //        Intent intent = new Intent(activity.getApplicationContext(), NoteListActivity.class);
@@ -141,8 +147,14 @@ public class ActivityLauncher {
         activity.startActivity(intent);
     }
 
+    public static void startSearchForResult(Activity context, Long searchType) {  //0: Note, 1: Blog, 2: Notebook
+        Intent intent = new Intent(context, SearchActivity.class);
+        intent.putExtra(SearchActivity.SEARCH_TYPE, searchType);
+        context.startActivityForResult(intent, RequestCodes.SEARCH_NOTE);
+    }
     public static void startSearchForResult(Activity context) {
         Intent intent = new Intent(context, SearchActivity.class);
+        intent.putExtra(SearchActivity.SEARCH_TYPE, new Long(0));
         context.startActivityForResult(intent, RequestCodes.SEARCH_NOTE);
     }
 }

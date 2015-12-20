@@ -254,4 +254,6 @@
     <string name="title_activity_search">SearchActivity</string>
 
     <string name="add_new_note">Add Note</string>
+    <string name="title_activity_notebook__view_note">Notebook_ViewNote</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

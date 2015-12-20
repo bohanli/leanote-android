@@ -202,6 +202,21 @@ public class LeanoteDB extends SQLiteOpenHelper {
             SqlUtils.closeCursor(c);
         }
     }
+    public NoteDetailList getNotesListByNotebookId(String notebookId) {
+        NoteDetailList listPosts = new NoteDetailList();
+
+        //Cursor c = db.query(NOTES_TABLE, null, null, null, null, null, "");
+        Cursor c = db.query(NOTES_TABLE, null, null, null, null, null, "updatedTime DESC");
+        try {
+            while (c.moveToNext()) {
+                NoteDetail detail = fillNote(c);
+                if (detail.getNoteBookId().equals(notebookId)) listPosts.add(detail);
+            }
+            return listPosts;
+        } finally {
+            SqlUtils.closeCursor(c);
+        }
+    }
 
 
 

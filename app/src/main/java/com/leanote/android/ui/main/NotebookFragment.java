@@ -96,7 +96,7 @@ public class NotebookFragment extends Fragment
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(0, 0));
         int spacingVertical = context.getResources().getDimensionPixelSize(R.dimen.reader_card_gutters);
         int spacingHorizontal = context.getResources().getDimensionPixelSize(R.dimen.content_margin);
-        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(spacingHorizontal, spacingVertical));
+        //mRecyclerView.addItemDecoration(new RecyclerItemDecoration(spacingHorizontal, spacingVertical));
 
         mFabView.setOnClickListener(new View.OnClickListener() {
             @Override

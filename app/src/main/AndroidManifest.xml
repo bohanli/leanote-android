@@ -22,7 +22,7 @@
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
 
-    <!--   GCM all build types configuration   -->
+    <!-- GCM all build types configuration -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -61,8 +61,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LeaMainActivity"
-            android:theme="@style/AppTheme4Preview">
+        <activity
+            android:name=".ui.LeaMainActivity"
+            android:theme="@style/AppTheme4Preview" >
         </activity>
         <activity android:name=".ui.LeaMainActivity2" >
         </activity>
@@ -132,12 +133,19 @@
             android:name=".ui.post.BlogHomeActivity"
             android:theme="@style/LeanoteNoActionBarTheme" >
         </activity>
-
-        <activity
-            android:name=".ui.search.SearchActivity" >
+        <activity android:name=".ui.search.SearchActivity" >
+        </activity>
+        <activity android:name=".ui.ShareNoteActivity" >
         </activity>
         <activity
-            android:name=".ui.ShareNoteActivity">
+            android:name=".ui.main.Notebook_ViewNote"
+            android:label="@string/title_activity_notebook__view_note"
+            android:theme="@style/Leanote.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".ui.main.Main2Activity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/Leanote.NoActionBar" >
         </activity>
     </application>
 

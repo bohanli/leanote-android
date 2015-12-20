@@ -10,13 +10,15 @@ import com.leanote.android.R;
 
 public class SearchActivity extends AppCompatActivity {
 
+    public static final String SEARCH_TYPE = "search_type";
+
+    private Long seachType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-
-        Log.v("SearchActivity", "haha");
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -25,6 +27,12 @@ public class SearchActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+
+        if (savedInstanceState != null) {
+            seachType = savedInstanceState.getLong(SEARCH_TYPE);
+        } else {
+            seachType = getIntent().getLongExtra(SEARCH_TYPE, 0);
+        }
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, SearchFragment.newInstance())
@@ -41,4 +49,6 @@ public class SearchActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    Long getSeachType() { return seachType; }
 }
