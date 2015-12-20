@@ -164,7 +164,13 @@ public class NoteListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
 
-            noteHolder.txtDate.setText(note.getUpdatedTime());
+            NotebookInfo notebook = Leanote.leaDB.getNotebookByNotebookId(note.getNoteBookId()), tmpNotebook;
+            String notebookString = "/" + notebook.getTitle();
+            while ((tmpNotebook = Leanote.leaDB.getNotebookByNotebookId(notebook.getParentNotebookId())) != null) {
+                notebook = tmpNotebook;
+                notebookString = "/" + notebook.getTitle() + notebookString;
+            }
+            noteHolder.txtDate.setText(note.getUpdatedTime().substring(0, 10) + "  " + notebookString);
             noteHolder.txtDate.setVisibility(View.VISIBLE);
             noteHolder.btnTrash.setButtonType(PostListButton.BUTTON_TRASH);
 

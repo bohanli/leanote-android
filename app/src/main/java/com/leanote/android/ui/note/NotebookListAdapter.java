@@ -162,7 +162,7 @@ public class NotebookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         postHolder.arrow.setVisibility(View.VISIBLE);
 
         if (mNotebookLevel.get(position-1) > 0)
-            ((CardView) postHolder.itemView).setCardBackgroundColor(0xFFFFFFFF - Math.min(0x888888, mNotebookLevel.get(position-1)*0x111111));
+            ((CardView) postHolder.itemView).setCardBackgroundColor(0xFFFFFFFF - Math.min(0x888888, mNotebookLevel.get(position-1)*0x0A0A0A));
 
 //            postHolder.txtDate.setText(notebook.getUpdateTime());  /////////////
 //            postHolder.txtDate.setVisibility(View.VISIBLE);

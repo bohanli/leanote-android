@@ -180,6 +180,7 @@ public class LegacyEditorFragment extends EditorFragmentAbstract implements Text
         mFormatBar = (LinearLayout) rootView.findViewById(R.id.format_bar);
         mSlidingBar = (LinearLayout) rootView.findViewById(R.id.sliding_bar);
         mCursorSeekBar = (SeekBar) rootView.findViewById(R.id.cursor_seek_bar);
+        mCursorSeekBar.setAlpha(0);
         mTitleEditText = (EditText) rootView.findViewById(R.id.post_title);
         mTitleEditText.setText(mTitle);
         mTitleEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {

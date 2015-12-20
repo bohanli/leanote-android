@@ -186,6 +186,27 @@ public class LeanoteDB extends SQLiteOpenHelper {
     }
 
 
+    public NotebookInfo getNotebookByNotebookId(String notebookId) {
+        String[] args = {notebookId};
+        Cursor c = db.query(NOTEBOOKS_TABLE, null, "notebookId=?", args, null, null, "");
+
+        NotebookInfo notebook = null;
+        try {
+            if (c.moveToNext()) {
+                notebook = new NotebookInfo();
+                notebook.setId(c.getInt(0));
+                notebook.setNotebookId(c.getString(1));
+                notebook.setParentNotebookId(c.getString(c.getColumnIndex("parentNotebookId")));
+                notebook.setTitle(c.getString(4));
+                notebook.setIsDirty(c.getInt(8) == 1);
+            }
+            return notebook;
+        } finally {
+            SqlUtils.closeCursor(c);
+        }
+    }
+
+
     public NoteDetailList getNotesList(String userId) {
         NoteDetailList listPosts = new NoteDetailList();
 
@@ -730,7 +751,6 @@ public class LeanoteDB extends SQLiteOpenHelper {
         }
 
     }
-
     public long addNotebook(NotebookInfo newNotebook) {
         ContentValues values = new ContentValues();
 
